@@ -1,0 +1,21 @@
+services:
+    pms:
+        image: plexinc/pms-docker
+        container_name: pms
+        restart: unless-stopped
+        network_mode: host 
+        volumes:
+            - ./pms:/config
+            - ./pms:/transcode
+            - /volume1/media:/data
+        environment:
+          TZ: America/New_York
+    threadfin:
+        image: fyb3roptik/threadfin:1.2.37
+        container_name: threadfin
+        restart: unless-stopped
+        network_mode: host
+        volumes:
+            - ./threadfin:/home/threadfin/conf
+        environment:
+          TZ: America/New_York
