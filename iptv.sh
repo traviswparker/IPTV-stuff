@@ -21,10 +21,10 @@ usage:
 
 IPTV account lists should be:
 
-FILTER=category to select,!category to exclude,... 
-STRIP=pattern to strip from channel names,... 
-REMOVE=pattern of channels to remove,... 
-
+FILTER=categories to select, !pattern to excldue
+STRIP=patterns to strip from channel names. ^startwith, endswith$, or anywhere if no modifier
+REMOVE=patterns for channels to remove. matches anywhere.
+REPLACE=replace channels where names match all but the pattern with the channel matching the pattern. ' UHD' will replace 'ABC'  'ABC UHD' exists.
 followed by a list of:
 SERVER USER PASS
 ...
