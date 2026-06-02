@@ -56,9 +56,12 @@ then
 		total=`echo $l | cut -d' ' -f5 | cut -d/ -f2`
 		echo $(($total-$used))' open '$l >> .tmp
 	done
+	echo
 	grep open .tmp | sort -r -n -k1
-	./xtream.py `grep open .tmp | sort -r -n -k1| cut -d' ' -f3-5 | head -1` $2
+	echo
+	./xtream.py `grep open .tmp | sort -r -n -k1 | cut -d' ' -f3-5 | head -1` $2
 	curl http://$IP:$PORT/api/ -d '{"cmd":"update.m3u"}'; echo
+	echo
 	docker logs -fn25 threadfin 2>&1 | grep -v PMS
 fi
 
