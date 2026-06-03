@@ -1,7 +1,6 @@
 FILTER='USA,!USA LOW BANDWIDTH'
-STRIP='^USA , (SHD), (SD), LHD, EAST'
-REMOVE='WEST'
-REPLACE=' UHD, (UHD)'
+STRIP='^USA , EAST, (SHD)'
+REMOVE='WEST, LHD, SD, (SD)'
 http://s.rocketdns.info:8080 mediahost247 JD97213hj0fjhgFfdhdgfhja3j12kHJDJgeh
 http://s.rocketdns.info:8080 monstercable Dq6jjknxCr
 http://s.rocketdns.info:8080 R6NARooECR sRopDAGpBx
