@@ -82,7 +82,6 @@ if M3U: #only checking active/expires
             out.append([n,
                 cats[s['category_id']], 
                 s['epg_channel_id'],
-                s['name'],  
                 s['stream_icon'], 
                 s['stream_id']
                 ])
