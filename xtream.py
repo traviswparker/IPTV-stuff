@@ -22,8 +22,8 @@ try:
     REMOVE.remove('')
 except:
     pass
-# pattern will replace channels matching name-pattern only if name+pattern exists
-# example: ' UHD' will replace ABC with ABC UHD only if ABC UHD exists.
+# replace any channels with the same name if a channel matching name+pattern exists 
+# example: REPLACE=' UHD' will turn 'ABC UHD' into 'ABC', removing any channels named 'ABC', but only if 'ABC UHD' exists.
 REPLACE=os.getenv('REPLACE','').split(',')
 try: 
     REPLACE.remove('')
@@ -59,8 +59,9 @@ if M3U: #only checking active/expires
     cats=dict( (e['category_id'],e['category_name']) for e in request('get_live_categories') \
             if any (e['category_name'].startswith(f) for f in FILTER) \
             and not any (e['category_name'].startswith(f) for f in EXCLUDE) )
-    print(sorted(cats.values()))
+    print('categories',len(cats))
     streams=[s for s in request('get_live_streams') if s['category_id'] in cats]
+    print('streams',len(streams))
     with open(M3U,'w') as m3u:
         out=[]
         skip=[]
@@ -80,7 +81,8 @@ if M3U: #only checking active/expires
             n=n.replace(',','') #plex does not like commas
             out.append([n,
                 cats[s['category_id']], 
-                s['epg_channel_id'],  
+                s['epg_channel_id'],
+                s['name'],  
                 s['stream_icon'], 
                 s['stream_id']
                 ])
@@ -91,6 +93,7 @@ if M3U: #only checking active/expires
             if s[0] not in skip:
                 for r in REPLACE:
                     if s[0].endswith(r):
+                        o=s[0]
                         s[0]=s[0][:-len(r)]
                 print('#EXTINF:-1 group-title="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s",%s' % (s[1],s[2],s[0],s[3],s[0]), file=m3u)
                 print('http://%s:%s/live/%s/%s/%s.%s' % (

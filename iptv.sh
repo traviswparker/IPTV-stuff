@@ -24,7 +24,8 @@ IPTV account lists should be:
 FILTER=categories to select, !pattern to excldue
 STRIP=patterns to strip from channel names. ^startwith, endswith$, or anywhere if no modifier
 REMOVE=patterns for channels to remove. matches anywhere.
-REPLACE=replace channels where names match all but the pattern with the channel matching the pattern. ' UHD' will replace 'ABC'  'ABC UHD' exists.
+REPLACE=replace any channels with the same name if a channel matching name+pattern exists 
+ example: REPLACE=' UHD' will turn 'ABC UHD' into 'ABC', removing any channels named 'ABC', but only if 'ABC UHD' exists.
 followed by a list of:
 SERVER USER PASS
 ...
