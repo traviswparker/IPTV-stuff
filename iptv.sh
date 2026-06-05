@@ -38,7 +38,7 @@ OIFS=$IFS
 IFS=$'\n'
 for e in `grep -v ^http $IN`
 do
-	eval export _=_ $e
+	eval export $e &> /dev/null
 done
 for e in `grep ^http $IN`
 do
