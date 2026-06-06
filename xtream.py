@@ -6,72 +6,93 @@ import sys
 import os
 from datetime import datetime
 
-#handle env args
-#uppercase all names
-UPPER=int(os.getenv('UPPER',1)) 
+THREADFIN='http://10.0.0.10:34400/api/'
+
+ENV_VARS=['UPPER','FORMAT','FILTER','STRIP','REMOVE','REPLACE','THREADFIN']
+
+UPPER=1  
 #stream format
-FORMAT=os.getenv('FORMAT','ts') 
+FORMAT='ts'
 # filter to these categories 
-FILTER=os.getenv('FILTER','').split(',') #categories to select, !pattern to excldue
+FILTER='USA'
+STRIP='^US: ,^USA: ,^US | ,^USA | '
+REMOVE=''
+REPLACE=''
+
+#config from env
+for e in ENV_VARS:
+    globals()[e]=os.getenv(e,globals()[e])
+
+#config from k=v in file
+if len(sys.argv)>1 and not sys.argv[1].startswith('http'):
+    with open(sys.argv[1]) as f:
+        lines=f.readlines()
+        for l in lines:
+            l=l.split('#')[0]
+            if '=' in l:
+                k,v=l.strip('\n').split('=',1)
+                if k in ENV_VARS:
+                    globals()[k]=v
+
+#parse config
+FILTER=FILTER.split(',')
 EXCLUDE=[f[1:] for f in FILTER if f.startswith('!')] 
 FILTER=[f for f in FILTER if not f.startswith('!')]
 # patterns to strip from channel names. ^startwith, endswith$, or anywhere if no modifier
-STRIP=os.getenv('STRIP','^US: ,^USA: ,^US | ,^USA | ').split(',')
+STRIP=STRIP.split(',')
 STRIP.append(',') #plex does not like commas in channel names
 # pattern of channels to remove.
-REMOVE=os.getenv('REMOVE','').split(',')
+REMOVE=REMOVE.split(',')
 try: 
     REMOVE.remove('')
 except:
     pass
 # replace any channels with base name if a channel matching name+pattern exists 
 # example: REPLACE=' LHD' will rename 'ABC LHD' to 'ABC', removing any channels named 'ABC', but only if 'ABC LHD' exists.
-REPLACE=os.getenv('REPLACE','').split(',')
+REPLACE=REPLACE.split(',')
 try: 
     REPLACE.remove('')
 except:
     pass
 
-# handle shell args
-URL, USER, PASS = sys.argv[1:4]
-try:
-    M3U=sys.argv[4]
-except:
-    M3U=URL.split('/')[2].split('.')[0]+'.m3u'
+for e in ENV_VARS:
+    print (e,globals()[e])
 
-def request(action):
-    r=requests.get(URL+'/player_api.php',params={'username':USER,'password':PASS,'action':action})
+def request(url,user,pw,action):
+    r=requests.get(url+'/player_api.php',params={'username':user,'password':pw,'action':action})
     print (action,r.status_code, file=sys.stderr)
     r.raise_for_status()
     return json.loads(r.text)
 
 # get server and account info
-info=request('server_info')
-try:
-    server_info,user_info=info['server_info'],info['user_info']
-    print('%s %s %s %s %s/%s %s' % (
-        URL,USER,PASS,
-        user_info['status'],
-        user_info['active_cons'],
-        user_info['max_connections'],
-        datetime.fromtimestamp(int(user_info['exp_date'])) if user_info['exp_date'] else None
-        ))
-except:
-    sys.exit(1)
+def check(url,user,pw):
+    info=request(url,user,pw,'server_info')
+    try:
+        server_info,user_info=info['server_info'],info['user_info']
+        print('%s %s %s %s %s/%s %s' % (
+            url,user,pw,
+            user_info['status'],
+            user_info['active_cons'],
+            user_info['max_connections'],
+            datetime.fromtimestamp(int(user_info['exp_date'])) if user_info['exp_date'] else None
+            ),file=sys.stderr)
+        return url,user,pw,int(user_info['active_cons']),int(user_info['max_connections']), user_info['status'], server_info
+    except:
+        return url, user, pw, None, None, '', {}
 
 # if generating m3u
-if M3U: 
-    cats=dict( (e['category_id'],e['category_name']) for e in request('get_live_categories') \
+def write(url,user,pw,server_info,m3u):
+    cats=dict( (e['category_id'],e['category_name']) for e in request(url,user,pw,'get_live_categories') \
             if any (e['category_name'].startswith(f) for f in FILTER) \
             and not any (e['category_name'].startswith(f) for f in EXCLUDE) )
     print('categories',len(cats))
-    streams=[s for s in request('get_live_streams') if s['category_id'] in cats]
+    streams=[s for s in request(url,user,pw,'get_live_streams') if s['category_id'] in cats]
     print('streams',len(streams))
 
     #remove and rename streams
     out=[]
     for s in streams:
-        n=s['name'].upper() if UPPER else s['name']
+        n=s['name'].upper() if int(UPPER) else s['name']
         if  any(r in n for r in REMOVE):
             continue
         for p in STRIP:
@@ -103,15 +124,72 @@ if M3U:
     
     #write out m3u
     i=0
-    with open(M3U,'w') as m3u:
-        print('#EXTM3U',file=m3u)
+    with open(m3u,'w') as f:
+        print('#EXTM3U',file=f)
         for s in streams:
-            print('#EXTINF:-1 group-title="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s",%s' % (s[1],s[2],s[0],s[3],s[0]), file=m3u)
+            print('#EXTINF:-1 group-title="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s",%s' % (s[1],s[2],s[0],s[3],s[0]), file=f)
             print('http://%s:%s/live/%s/%s/%s.%s' % (
-                server_info['url'].replace('hqttp://',''),
+                server_info['url'].replace('http://',''),
                 server_info['port'],
-                USER, PASS, s[4], FORMAT 
-                ), file=m3u)
+                user, pw, s[4], FORMAT 
+                ), file=f)
             i+=1
-    print(M3U,i)
-    print('xmltv %s/xmltv.php?username=%s&password=%s' % (URL,USER,PASS))
+    print(m3u,i)
+    print('xmltv %s/xmltv.php?username=%s&password=%s' % (url,user,pw))
+
+if len(sys.argv) < 2:
+    print('''
+usage: 
+	./iptv.sh <URL> <user> <pass> (to check account)
+	./iptv.sh <URL> <user> <pass> [m3u_file] (to generate m3u)
+	./iptv.sh <account_list> (to check all acccounts)
+	./iptv.sh <account_list> [m3u file] (to generate m3u for least used account, tell threadfin to reload)
+
+IPTV account lists should be:
+
+FILTER=categories to select, !pattern to excldue
+STRIP=patterns to strip from channel names. ^startwith, endswith$, or anywhere if no modifier
+REMOVE=patterns for channels to remove. matches anywhere.
+REPLACE=replace any channels with the same name if a channel matching name+pattern exists 
+ example: REPLACE=' UHD' will turn 'ABC UHD' into 'ABC', removing any channels named 'ABC', but only if 'ABC UHD' exists.
+
+followed by a list of:
+SERVER USER PASS
+''')
+    sys.exit(0)
+
+if sys.argv[1].startswith('http'):
+    url, user, pw = sys.argv[1:4]
+    if len(sys.argv)>4:
+        m3u=sys.argv[4]
+    else:
+        m3u=None
+    url,user,pw,used,limit,status,server_info=check(url,user,pw)
+    if m3u: write(url,user,pw,server_info,m3u)
+else:
+    if len(sys.argv)>2:
+        m3u=sys.argv[2]
+    else:
+        m3u=None
+    accts=[]
+    with open(sys.argv[1]) as f:
+        lines=f.readlines()
+        for l in lines:
+            if l.startswith('http'):
+                url,user,pw=l.strip().split()[:3]
+                accts.append(check(url,user,pw))
+        if m3u:
+            #remove dead accouts
+            accts=[a for a in accts if a[-2].lower()=='active']
+            #sort by max-active, descending
+            accts.sort(key=lambda a: a[4]-a[3], reverse=True)
+            for a in accts:
+                print (a[4]-a[3], *a[0:3])
+            if accts:
+                a=accts[0]
+                write(a[0],a[1],a[2],a[-1],m3u)
+                if THREADFIN:
+                    r=requests.post(THREADFIN,json=dict(cmd='update.m3u'))
+                    print (r,r.text)
+                    r=requests.post(THREADFIN,json=dict(cmd='status'))
+                    print (r,r.text)

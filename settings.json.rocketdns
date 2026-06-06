@@ -26,10 +26,10 @@
         "compatibility": {
           "group.title": 99,
           "stream.id": 100,
-          "streams": 308,
+          "streams": 309,
           "tvg.id": 100
         },
-        "counter.download": 135,
+        "counter.download": 166,
         "counter.error": 0,
         "description": "",
         "file.source": "https://raw.githubusercontent.com/BuddyChewChew/My-Streams/refs/heads/main/tv.m3u",
@@ -39,7 +39,7 @@
         "http_proxy.ip": "",
         "http_proxy.port": "",
         "id.provider": "MF009SPI2SQKIG505XXQ",
-        "last.update": "2026-06-04 17:10:41",
+        "last.update": "2026-06-06 13:46:45",
         "name": "buddylive",
         "provider.availability": 100,
         "tuner": 2,
@@ -50,11 +50,11 @@
         "compatibility": {
           "group.title": 100,
           "stream.id": 100,
-          "streams": 1748,
+          "streams": 1749,
           "tvg.id": 100
         },
-        "counter.download": 411,
-        "counter.error": 10,
+        "counter.download": 443,
+        "counter.error": 20,
         "description": "",
         "file.source": "/home/threadfin/conf/local.m3u",
         "file.threadfin": "MIWPHGJCRTMCA6QH3M0V.m3u",
@@ -63,34 +63,10 @@
         "http_proxy.ip": "",
         "http_proxy.port": "",
         "id.provider": "MIWPHGJCRTMCA6QH3M0V",
-        "last.update": "2026-06-04 17:10:40",
+        "last.update": "2026-06-06 13:46:46",
         "name": "local",
-        "provider.availability": 97,
+        "provider.availability": 95,
         "tuner": 4,
-        "type": "m3u"
-      },
-      "MNVZVHJ9RXNMS7KWIAYH": {
-        "buffer": "ffmpeg",
-        "compatibility": {
-          "group.title": 99,
-          "stream.id": 100,
-          "streams": 177,
-          "tvg.id": 100
-        },
-        "counter.download": 134,
-        "counter.error": 0,
-        "description": "",
-        "file.source": "https://tvpass.org/playlist/m3u",
-        "file.threadfin": "MNVZVHJ9RXNMS7KWIAYH.m3u",
-        "http_headers.origin": "",
-        "http_headers.referer": "",
-        "http_proxy.ip": "",
-        "http_proxy.port": "",
-        "id.provider": "MNVZVHJ9RXNMS7KWIAYH",
-        "last.update": "2026-06-04 17:10:41",
-        "name": "tvpass",
-        "provider.availability": 100,
-        "tuner": 1,
         "type": "m3u"
       }
     },
