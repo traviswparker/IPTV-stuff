@@ -5,8 +5,8 @@ services:
         restart: unless-stopped
         network_mode: host 
         volumes:
-            - /volume1/docker/plex/pms:/config
-            - /volume1/docker/plex/pms:/transcode
+            - ./pms:/config
+            - ./pms:/transcode
             - /volume1/media:/data
         environment:
           TZ: America/New_York
@@ -16,6 +16,6 @@ services:
         restart: unless-stopped
         network_mode: host
         volumes:
-            - /volume1/docker/plex/threadfin:/home/threadfin/conf
+            - ./threadfin:/home/threadfin/conf
         environment:
           TZ: America/New_York
