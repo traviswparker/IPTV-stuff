@@ -8,7 +8,7 @@ from datetime import datetime
 
 THREADFIN='http://10.0.0.10:34400/api/'
 
-ENV_VARS=['UPPER','FORMAT','FILTER','STRIP','REMOVE','REPLACE','THREADFIN']
+ENV_VARS=['FILTER','STRIP','REMOVE','REPLACE','UPPER','FORMAT','THREADFIN']
 
 UPPER=1  
 #stream format
@@ -55,9 +55,6 @@ try:
 except:
     pass
 
-for e in ENV_VARS:
-    print (e,globals()[e])
-
 def request(url,user,pw,action):
     r=requests.get(url+'/player_api.php',params={'username':user,'password':pw,'action':action})
     print (action,r.status_code, file=sys.stderr)
@@ -75,7 +72,7 @@ def check(url,user,pw):
             user_info['active_cons'],
             user_info['max_connections'],
             datetime.fromtimestamp(int(user_info['exp_date'])) if user_info['exp_date'] else None
-            ),file=sys.stderr)
+            ))
         return url,user,pw,int(user_info['active_cons']),int(user_info['max_connections']), user_info['status'], server_info
     except:
         return url, user, pw, None, None, '', {}
@@ -155,7 +152,11 @@ REPLACE=replace any channels with the same name if a channel matching name+patte
 
 followed by a list of:
 SERVER USER PASS
-''')
+
+defaults:''')
+
+    for e in ENV_VARS:
+        print (e,globals()[e])
     sys.exit(0)
 
 if sys.argv[1].startswith('http'):
@@ -182,11 +183,11 @@ else:
             #remove dead accouts
             accts=[a for a in accts if a[-2].lower()=='active']
             #sort by max-active, descending
-            accts.sort(key=lambda a: a[4]-a[3], reverse=True)
+            accts.sort(key=lambda a: a[4]-a[3])
             for a in accts:
                 print (a[4]-a[3], *a[0:3])
             if accts:
-                a=accts[0]
+                a=accts[-1]
                 write(a[0],a[1],a[2],a[-1],m3u)
                 if THREADFIN:
                     r=requests.post(THREADFIN,json=dict(cmd='update.m3u'))
