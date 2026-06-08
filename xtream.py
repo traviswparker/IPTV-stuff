@@ -75,6 +75,7 @@ def check(url,user,pw):
             ))
         return url,user,pw,int(user_info['active_cons']),int(user_info['max_connections']), user_info['status'], server_info
     except:
+        print(info,url,user,pw,file=sys.stderr)
         return url, user, pw, None, None, '', {}
 
 # if generating m3u
