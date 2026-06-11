@@ -1,6 +1,6 @@
 FILTER=^USA,SPORTS,ESPN
 REMOVE=CA: #
-STRIP=^USA: ,^BASICS: ,^USA | #
+STRIP=^USA: ,^BASICS: ,^USA | , EAST$, (EAST)$#
 
 http://2atv.xyz:83 23MIKE23 4589610273 
 http://2atv.xyz:83 Christyadams 9561427830 

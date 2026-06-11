@@ -18,7 +18,7 @@ UPPER=1
 #stream format
 FORMAT='ts'
 # filter to these categories 
-FILTER='^USA'
+FILTER=''
 STRIP='^US: ,^USA: ,^US | ,^USA | '
 REMOVE=''
 REPLACE=''
@@ -40,26 +40,24 @@ if len(sys.argv)>1 and not sys.argv[1].startswith('http'):
 
 #parse config
 FILTER=FILTER.split(',')
+if '' in FILTER: FILTER.remove('')
 FILTER_EXCLUDE=[f[1:] for f in FILTER if f.startswith('!')]
 FILTER_STARTSWITH=[f[1:] for f in FILTER if f.startswith('^')]
 FILTER_ENDSWITH=[f[:-1] for f in FILTER if f.endswith('$')]
 FILTER=[f for f in FILTER if not f.startswith('!') and not f.startswith('^') and not f.endswith('$')]
+if not any ([FILTER, FILTER_EXCLUDE, FILTER_STARTSWITH, FILTER_ENDSWITH]):
+    FILTER=None
 # patterns to strip from channel names. ^startwith, endswith$, or anywhere if no modifier
 STRIP=STRIP.split(',')
+if '' in STRIP: STRIP.remove('')
 STRIP.append(',') #plex does not like commas in channel names
 # pattern of channels to remove.
 REMOVE=REMOVE.split(',')
-try: 
-    REMOVE.remove('')
-except:
-    pass
+if '' in REMOVE: REMOVE.remove('')
 # replace any channels with base name if a channel matching name+pattern exists 
 # example: REPLACE=' LHD' will rename 'ABC LHD' to 'ABC', removing any channels named 'ABC', but only if 'ABC LHD' exists.
 REPLACE=REPLACE.split(',')
-try: 
-    REPLACE.remove('')
-except:
-    pass
+if '' in REPLACE: REPLACE.remove('')
 
 def xtream_request(url,user,pw,action):
     r=requests.get(url+'/player_api.php',params={'username':user,'password':pw,'action':action})
@@ -126,7 +124,7 @@ def check_mag(url, mac):
 
 def fetch_xtream(url,user,pw):
     cats=dict( (e['category_id'],e['category_name']) for e in xtream_request(url,user,pw,'get_live_categories') \
-        if e['category_name'] in FILTER \
+        if FILTER is None or e['category_name'] in FILTER \
         or any(e['category_name'].startswith(f) for f in FILTER_STARTSWITH) \
         or any(e['category_name'].endswith(f) for f in FILTER_ENDSWITH) \
         and not any (e['category_name'].startswith(f) for f in FILTER_EXCLUDE) )
@@ -146,7 +144,7 @@ def fetch_mag(url,mac,token):
     r.raise_for_status()
     genre_data = r.json()["js"]
     cats = dict( (e["id"], e["title"]) for e in genre_data \
-            if e['title'] in FILTER \
+            if FILTER is None or e['title'] in FILTER \
             or any(e['title'].startswith(f) for f in FILTER_STARTSWITH) \
             or any(e['title'].endswith(f) for f in FILTER_ENDSWITH)\
             and not any(e['title'].startswith(f) for f in FILTER_EXCLUDE) )
@@ -258,7 +256,7 @@ if sys.argv[1].startswith('http'):
         else:
             m3u=None        
         url,user,pw,used,limit,status,server_info=check_xtream(url,user,pw)
-    if m3u: write(url,user,pw,server_info,m3u)
+    if m3u: generate_m3u(url,user,pw,server_info,m3u)
 else:
     if len(sys.argv)>2:
         m3u=sys.argv[2]
@@ -277,7 +275,7 @@ else:
                     url,user=l.strip().split()[:2]
                     accts.append(check_mag(url,user))
                     mag=True
-            time.sleep(int(DELAY))
+                time.sleep(int(DELAY))
         if m3u:
             #remove dead accouts
             accts=[a for a in accts if a[-2].lower()=='active']

@@ -68,30 +68,6 @@
         "provider.availability": 96,
         "tuner": 4,
         "type": "m3u"
-      },
-      "MNVZVHJ9RXNMS7KWIAYH": {
-        "buffer": "-",
-        "compatibility": {
-          "group.title": 99,
-          "stream.id": 100,
-          "streams": 177,
-          "tvg.id": 100
-        },
-        "counter.download": 5,
-        "counter.error": 0,
-        "description": "",
-        "file.source": "https://tvpass.org/playlist/m3u",
-        "file.threadfin": "MNVZVHJ9RXNMS7KWIAYH.m3u",
-        "http_headers.origin": "",
-        "http_headers.referer": "",
-        "http_proxy.ip": "",
-        "http_proxy.port": "",
-        "id.provider": "MNVZVHJ9RXNMS7KWIAYH",
-        "last.update": "2026-05-26 23:31:00",
-        "name": "tvpass",
-        "provider.availability": 100,
-        "tuner": 1,
-        "type": "m3u"
       }
     },
     "xmltv": {}
