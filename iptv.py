@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import time 
 import requests
 import json
 import sys
@@ -10,7 +10,9 @@ import random
 
 THREADFIN='http://10.0.0.10:34400/api/'
 
-ENV_VARS=['FILTER','STRIP','REMOVE','REPLACE','UPPER','FORMAT','THREADFIN']
+DELAY=1
+
+ENV_VARS=['DELAY','FILTER','STRIP','REMOVE','REPLACE','UPPER','FORMAT','THREADFIN']
 
 UPPER=1  
 #stream format
@@ -70,8 +72,10 @@ def check_xtream(url,user,pw):
     info=xtream_request(url,user,pw,'server_info')
     try:
         server_info,user_info=info['server_info'],info['user_info']
-        print('%s %s %s %s %s/%s %s' % (
-            url,user,pw,
+        print('%s:%s %s %s %s %s/%s %s' % (
+            server_info['url'],
+            server_info['port'],
+            user,pw,
             user_info['status'],
             user_info['active_cons'],
             user_info['max_connections'],
@@ -87,7 +91,6 @@ def start_session(url,mac):
     session.cookies.update({"mac": mac})
     session.headers.update(
         {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
             "Referer": f"{url}/c/",
             "Accept": "application/json, text/javascript, */*; q=0.01",
             "X-Requested-With": "XMLHttpRequest",
@@ -156,8 +159,7 @@ def fetch_mag(url,mac,token):
     print('streams',len(streams))
     return cats, streams
 
-# if generating m3u
-def write(url,user,pw,server_info,m3u):
+def generate_m3u(url,user,pw,server_info,m3u):
     if server_info:
         cats,streams = fetch_xtream(url,user,pw)
     else:
@@ -202,13 +204,13 @@ def write(url,user,pw,server_info,m3u):
         print('#EXTM3U',file=f)
         for s in streams:
             print('#EXTINF:-1 group-title="%s" tvg-id="%s" tvg-name="%s" tvg-logo="%s",%s' % (s[1],s[2],s[0],s[3],s[0]), file=f)
-            if server_info:
+            if server_info: #xtream
                     print('http://%s:%s/live/%s/%s/%s.%s' % (
                     server_info['url'].replace('http://',''),
                     server_info['port'],
                     user, pw, s[4], FORMAT 
                     ), file=f)
-            else:
+            else: #mag
                     print("%s/play/live.php?mac=%s&stream=%s&extension=%s" % (url, user, s[4], FORMAT), file=f)
             i+=1
     print(m3u,i)
@@ -275,6 +277,7 @@ else:
                     url,user=l.strip().split()[:2]
                     accts.append(check_mag(url,user))
                     mag=True
+            time.sleep(int(DELAY))
         if m3u:
             #remove dead accouts
             accts=[a for a in accts if a[-2].lower()=='active']
@@ -287,9 +290,9 @@ else:
                     a=random.choice(accts)
                 else:
                     a=accts[-1]
-                write(a[0],a[1],a[2],a[-1],m3u)
+                generate_m3u(a[0],a[1],a[2],a[-1],m3u)
                 if THREADFIN:
                     r=requests.post(THREADFIN,json=dict(cmd='update.m3u'))
-                    print (r,r.text)
+                    print ('update',r,r.text)
                     r=requests.post(THREADFIN,json=dict(cmd='status'))
-                    print (r,r.text)
+                    print ('status',r,r.text)
