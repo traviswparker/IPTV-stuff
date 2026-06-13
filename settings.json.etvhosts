@@ -21,39 +21,15 @@
   "files": {
     "hdhr": {},
     "m3u": {
-      "MF009SPI2SQKIG505XXQ": {
-        "buffer": "ffmpeg",
-        "compatibility": {
-          "group.title": 99,
-          "stream.id": 100,
-          "streams": 342,
-          "tvg.id": 100
-        },
-        "counter.download": 6,
-        "counter.error": 0,
-        "description": "",
-        "file.source": "https://raw.githubusercontent.com/BuddyChewChew/My-Streams/refs/heads/main/tv.m3u",
-        "file.threadfin": "MF009SPI2SQKIG505XXQ.m3u",
-        "http_headers.origin": "",
-        "http_headers.referer": "",
-        "http_proxy.ip": "",
-        "http_proxy.port": "",
-        "id.provider": "MF009SPI2SQKIG505XXQ",
-        "last.update": "2026-05-26 23:30:59",
-        "name": "buddylive",
-        "provider.availability": 100,
-        "tuner": 2,
-        "type": "m3u"
-      },
       "MIWPHGJCRTMCA6QH3M0V": {
         "buffer": "-",
         "compatibility": {
           "group.title": 100,
           "stream.id": 100,
-          "streams": 1179,
+          "streams": 1196,
           "tvg.id": 100
         },
-        "counter.download": 277,
+        "counter.download": 284,
         "counter.error": 10,
         "description": "",
         "file.source": "/home/threadfin/conf/local.m3u",
@@ -63,7 +39,7 @@
         "http_proxy.ip": "",
         "http_proxy.port": "",
         "id.provider": "MIWPHGJCRTMCA6QH3M0V",
-        "last.update": "2026-05-26 23:30:59",
+        "last.update": "2026-06-12 10:17:28",
         "name": "local",
         "provider.availability": 96,
         "tuner": 4,
@@ -92,30 +68,6 @@
       "exclude": "",
       "filter": "REGIONALS",
       "include": "baltimore",
-      "liveEvent": false,
-      "name": "",
-      "startingNumber": "1000",
-      "type": "group-title",
-      "x-category": ""
-    },
-    "1": {
-      "-1": {
-        "caseSensitive": false,
-        "description": "",
-        "exclude": "",
-        "filter": "USA FHD",
-        "include": "",
-        "liveEvent": false,
-        "name": "",
-        "startingNumber": "1000",
-        "type": "group-title",
-        "x-category": ""
-      },
-      "caseSensitive": false,
-      "description": "",
-      "exclude": "",
-      "filter": "USA FHD",
-      "include": "",
       "liveEvent": false,
       "name": "",
       "startingNumber": "1000",

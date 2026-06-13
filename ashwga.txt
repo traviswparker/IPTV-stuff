@@ -1,0 +1,6 @@
+FILTER=^USA,SPORTS,ESPN,NBA,NFL,MLB,NHL
+REMOVE=CA: #
+STRIP=^USA: ,^BASICS: ,^USA | , EAST$, (EAST)$
+
+http://ahhshitherewegoagain.sytes.net:83 Christyadams 9561427830 
+http://ahhshitherewegoagain.sytes.net:83 23MIKE23 4589610273 

@@ -21,31 +21,7 @@
   "files": {
     "hdhr": {},
     "m3u": {
-      "MF009SPI2SQKIG505XXQ": {
-        "buffer": "ffmpeg",
-        "compatibility": {
-          "group.title": 100,
-          "stream.id": 100,
-          "streams": 354,
-          "tvg.id": 100
-        },
-        "counter.download": 23,
-        "counter.error": 0,
-        "description": "",
-        "file.source": "https://raw.githubusercontent.com/BuddyChewChew/My-Streams/refs/heads/main/tv.m3u",
-        "file.threadfin": "MF009SPI2SQKIG505XXQ.m3u",
-        "http_headers.origin": "",
-        "http_headers.referer": "",
-        "http_proxy.ip": "",
-        "http_proxy.port": "",
-        "id.provider": "MF009SPI2SQKIG505XXQ",
-        "last.update": "2026-05-28 10:16:47",
-        "name": "buddylive",
-        "provider.availability": 100,
-        "tuner": 2,
-        "type": "m3u"
-      },
-      "MIWPHGJCRTMCA6QH3M0V": {
+         "MIWPHGJCRTMCA6QH3M0V": {
         "buffer": "-",
         "compatibility": {
           "group.title": 100,
