@@ -1,21 +1,24 @@
 services:
     pms:
-        image: plexinc/pms-docker
+        image: plexinc/pms-docker:latest
         container_name: pms
         restart: unless-stopped
         network_mode: host 
         volumes:
             - ./pms:/config
             - ./pms:/transcode
-            - /volume1/media:/data
         environment:
-          TZ: America/New_York
-    threadfin:
-        image: fyb3roptik/threadfin:1.2.37
-        container_name: threadfin
+            TZ: America/New_York
+    tvserver:
+        image: eswardudi/python-ffmpeg:latest
+        container_name: tvserver
         restart: unless-stopped
         network_mode: host
         volumes:
-            - ./threadfin:/home/threadfin/conf
+            - .:/app
+        working_dir: /app
+        command: /bin/bash tvserver.sh config.txt
         environment:
-          TZ: America/New_York
+            DEVICE_ID: TVSERVER:4
+            SERVER_IP: 127.0.0.1
+            SERVER_PORT: 5004
