@@ -12,7 +12,7 @@ GROUPS=pattern of groups to match, default is exact match, ^pattern for start ma
 STRIP=patterns to strip from stream names. default is anywhere in name, ^pattern for start match, pattern$ for end match\
 STREAMS=patterns to include and !patterns for streams to remove, ignores GROUPS. matches anywhere in name.\
 REPLACE=replace any streams with the same name if a stream matching name+pattern exists.\
- example: REPLACE=' UHD' will turn 'ABC UHD' into 'ABC', removing any streams named 'ABC', but only if 'ABC UHD' exists.
+ example: REPLACE= UHD will turn 'ABC UHD' into 'ABC', removing any streams named 'ABC', but only if 'ABC UHD' exists.
 
 server config (can set in config or environment)\
 SERVER_IP, SERVER_PORT to set listening IP and port. Defaults to localhost:5004\
