@@ -12,15 +12,15 @@ THREADFIN='http://10.0.0.10:34400/api/'
 
 DELAY=1
 
-ENV_VARS=['DELAY','FILTER','STRIP','REMOVE','REPLACE','UPPER','FORMAT','THREADFIN']
+ENV_VARS=['DELAY','GROUPS','STRIP','REMOVE','REPLACE','UPPER','FORMAT','THREADFIN']
 
 UPPER=1  
 #stream format
 FORMAT='ts'
-# filter to these categories 
-FILTER=''
+# GROUPS to these categories 
+GROUPS=''
 STRIP='^US: ,^USA: ,^US | ,^USA | '
-REMOVE=''
+STREAMS=''
 REPLACE=''
 
 #config from env
@@ -39,21 +39,23 @@ if len(sys.argv)>1 and not sys.argv[1].startswith('http'):
                     globals()[k]=v
 
 #parse config
-FILTER=FILTER.split(',')
-if '' in FILTER: FILTER.remove('')
-FILTER_EXCLUDE=[f[1:] for f in FILTER if f.startswith('!')]
-FILTER_STARTSWITH=[f[1:] for f in FILTER if f.startswith('^')]
-FILTER_ENDSWITH=[f[:-1] for f in FILTER if f.endswith('$')]
-FILTER=[f for f in FILTER if not f.startswith('!') and not f.startswith('^') and not f.endswith('$')]
-if not any ([FILTER, FILTER_EXCLUDE, FILTER_STARTSWITH, FILTER_ENDSWITH]):
-    FILTER=None
+GROUPS=GROUPS.split(',')
+if '' in GROUPS: GROUPS.remove('')
+GROUPS_EXCLUDE=[f[1:] for f in GROUPS if f.startswith('!')]
+GROUPS_STARTSWITH=[f[1:] for f in GROUPS if f.startswith('^')]
+GROUPS_ENDSWITH=[f[:-1] for f in GROUPS if f.endswith('$')]
+GROUPS=[f for f in GROUPS if not f.startswith('!') and not f.startswith('^') and not f.endswith('$')]
+if not any ([GROUPS, GROUPS_EXCLUDE, GROUPS_STARTSWITH, GROUPS_ENDSWITH]):
+    GROUPS=None
 # patterns to strip from channel names. ^startwith, endswith$, or anywhere if no modifier
 STRIP=STRIP.split(',')
 if '' in STRIP: STRIP.remove('')
 STRIP.append(',') #plex does not like commas in channel names
-# pattern of channels to remove.
-REMOVE=REMOVE.split(',')
-if '' in REMOVE: REMOVE.remove('')
+# pattern of channels to select/remove.
+STREAMS=STREAMS.split(',')
+if '' in STREAMS: STREAMS.remove('')
+REMOVE=[c[1:] for c in STREAMS if c.startswith('!')]
+STREAMS=[c for c in STREAMS if not c.startswith('!')]
 # replace any channels with base name if a channel matching name+pattern exists 
 # example: REPLACE=' LHD' will rename 'ABC LHD' to 'ABC', removing any channels named 'ABC', but only if 'ABC LHD' exists.
 REPLACE=REPLACE.split(',')
@@ -124,10 +126,10 @@ def check_mag(url, mac):
 
 def fetch_xtream(url,user,pw):
     cats=dict( (e['category_id'],e['category_name']) for e in xtream_request(url,user,pw,'get_live_categories') \
-        if FILTER is None or e['category_name'] in FILTER \
-        or any(e['category_name'].startswith(f) for f in FILTER_STARTSWITH) \
-        or any(e['category_name'].endswith(f) for f in FILTER_ENDSWITH) \
-        and not any (e['category_name'].startswith(f) for f in FILTER_EXCLUDE) )
+        if GROUPS is None or e['category_name'] in GROUPS \
+        or any(e['category_name'].startswith(f) for f in GROUPS_STARTSWITH) \
+        or any(e['category_name'].endswith(f) for f in GROUPS_ENDSWITH) \
+        and not any (e['category_name'].startswith(f) for f in GROUPS_EXCLUDE) )
     print('categories',len(cats),sorted(cats.values()))
     streams=[s for s in xtream_request(url,user,pw,'get_live_streams') if s['category_id'] in cats]
     print('streams',len(streams))
@@ -144,16 +146,16 @@ def fetch_mag(url,mac,token):
     r.raise_for_status()
     genre_data = r.json()["js"]
     cats = dict( (e["id"], e["title"]) for e in genre_data \
-            if FILTER is None or e['title'] in FILTER \
-            or any(e['title'].startswith(f) for f in FILTER_STARTSWITH) \
-            or any(e['title'].endswith(f) for f in FILTER_ENDSWITH)\
-            and not any(e['title'].startswith(f) for f in FILTER_EXCLUDE) )
+            if GROUPS is None or e['title'] in GROUPS \
+            or any(e['title'].startswith(f) for f in GROUPS_STARTSWITH) \
+            or any(e['title'].endswith(f) for f in GROUPS_ENDSWITH)\
+            and not any(e['title'].startswith(f) for f in GROUPS_EXCLUDE) )
     print('categories',len(cats),sorted(cats.values()))
     url_channels = f"{url}/portal.php?type=itv&action=get_all_channels&JsHttpRequest=1-xml"
     r = session.get(url_channels, headers=headers)
     r.raise_for_status()
     channels_data = r.json()["js"]["data"]
-    streams = [dict( name=s['name'], category_id=s['tv_genre_id'], epg_channel_id=s['name'], stream_icon=s['logo'], stream_id=s['id']) for s in channels_data if s['tv_genre_id'] in cats]
+    streams = [dict( name=s['name'], category_id=s['tv_genre_id'], epg_channel_id=s['name'], stream_icon=s['logo'], stream_id=s['id']) for s in channels_data if s['tv_genre_id'] in cats or any(c.upper() in s['name'].upper() for c in STREAMS)]
     print('streams',len(streams))
     return cats, streams
 
@@ -225,9 +227,9 @@ usage:
 
 IPTV account lists should be:
 
-FILTER=pattern of categories to match, default is exact match, ^pattern for start match, pattern$ for end match, !pattern to exclude
+GROUPS=pattern of categories to match, default is exact match, ^pattern for start match, pattern$ for end match, !pattern to exclude
 STRIP=patterns to strip from channel names. default is anywhere in name, ^pattern for start match, pattern$ for end match
-REMOVE=patterns for channels to remove. matches anywhere in name.
+STREAMS=!patterns for channels to remove. matches anywhere in name.
 REPLACE=replace any channels with the same name if a channel matching name+pattern exists.
  example: REPLACE=' UHD' will turn 'ABC UHD' into 'ABC', removing any channels named 'ABC', but only if 'ABC UHD' exists.
 
