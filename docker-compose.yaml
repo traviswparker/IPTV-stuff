@@ -9,16 +9,15 @@ services:
             - ./pms:/transcode
         environment:
             TZ: America/New_York
-    tvserver:
-        image: eswardudi/python-ffmpeg:latest
-        container_name: tvserver
+    tuner:
+        image: nandyalu/python-ffmpeg
+        container_name: tuner
         restart: unless-stopped
         network_mode: host
         volumes:
-            - .:/app
+            - ./tuner:/app
         working_dir: /app
-        command: /bin/bash tvserver.sh config.txt
+        command: python -m tuner.py tuner.cfg
         environment:
-            DEVICE_ID: TVSERVER:4
             SERVER_IP: 127.0.0.1
             SERVER_PORT: 5004
