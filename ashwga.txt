@@ -1,7 +1,0 @@
-FILTER=^USA | BASICS,^USA | NEWS/WEATHER,^USA | PREMIUM,^USA | KIDS,^SPORTS
-CHANNELS=baltimore,!CA:,!WEST
-STRIP=^USA: ,^BASICS: ,^USA | , EAST$, (EAST)$
-DELAY=0
-
-http://ahhshitherewegoagain.sytes.net:83 Christyadams 9561427830 
-http://ahhshitherewegoagain.sytes.net:83 23MIKE23 4589610273 
