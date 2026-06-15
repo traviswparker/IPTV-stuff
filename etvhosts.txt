@@ -1,9 +1,0 @@
-FILTER=^USA,^REGIONALS,^SPORTS,^KIDS
-STRIP=USA: ,REG: , EAST, FHD, HD
-REMOVE=WEST
-
-http://etvhosts.site:55337 Dcoke07 u9Uk4m4iI6
-http://etvhosts.site:55337 JR8282 ST5599
-http://etvhosts.site:55337 XVtqq37E3e We00u25Ktl
-http://etvhosts.site:55337 marvgte Outlet7399
-http://etvhosts.site:55337 X54VEWcmX iPE84lc90j
